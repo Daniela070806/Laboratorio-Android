@@ -19,6 +19,9 @@ class RepoListViewModel : ViewModel() {
     private val _errorMsg = MutableStateFlow<String?>(value = null)
     val errMsg: StateFlow<String?> = _errorMsg.asStateFlow()
 
+    private val _isDeleteSuccess = MutableStateFlow(value = false)
+    val isDeleteSuccess: StateFlow<Boolean> = _isDeleteSuccess.asStateFlow()
+
     init {
         fetchRepos()
     }
@@ -36,5 +39,40 @@ class RepoListViewModel : ViewModel() {
                 _isLoading.value = false
             }
         }
+    }
+
+    // UNA SOLA FUNCIÓN UNIFICADA CON EL ÉXITO Y EL FETCH
+    fun deleteRepository(owner: String, repo: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _errorMsg.value = null
+
+            println("OWNER = $owner")
+            println("REPO = $repo")
+
+            try {
+                val response = RetrofitClient.apiService.deleteRepository(
+                    owner = owner,
+                    repo = repo
+                )
+
+                if (response.isSuccessful) {
+                    _isDeleteSuccess.value = true // Activa el Snackbar
+                    fetchRepos() // Recarga la lista
+                } else {
+                    _errorMsg.value = "Error al eliminar: Código ${response.code()} - ${response.message()}"
+                }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _errorMsg.value = "Error de red: ${e.localizedMessage}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun resetDeleteSuccess() {
+        _isDeleteSuccess.value = false
     }
 }

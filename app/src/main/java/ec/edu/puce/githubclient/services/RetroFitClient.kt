@@ -1,5 +1,9 @@
 package ec.edu.puce.githubclient.services
 
+
+import okhttp3.Interceptor
+
+import okhttp3.Request
 import ec.edu.puce.githubclient.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -7,7 +11,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    private const val BASE_URL = "https://api.github.com"
+    private const val BASE_URL = "https://api.github.com/"
 
     private val logging = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -17,10 +21,16 @@ object RetrofitClient {
         .addInterceptor(logging)
         .addInterceptor { chain ->
             val token = BuildConfig.GITHUB_TOKEN
-            println("GITHUB TOKEN: $token")
+            //println("GITHUB TOKEN: $token")
+
 
             val request = chain.request().newBuilder()
-                .addHeader("Authorization", "Bearer $token")
+                .addHeader("Authorization", "token $token")
+                //.addHeader("Authorization", "Bearer $token")
+                .addHeader("Cache-Control", "no-cache,no-store,must-revalidate")
+                .addHeader("Pragma","no-cache")
+                .addHeader("Expires","0")
+                .addHeader("Connection","close")
                 .build()
             chain.proceed(request)
         }

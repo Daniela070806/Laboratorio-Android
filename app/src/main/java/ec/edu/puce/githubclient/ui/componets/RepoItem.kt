@@ -8,7 +8,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 
@@ -27,7 +33,9 @@ import ec.edu.puce.githubclient.ui.theme.GithubClientTheme
 @Composable
 
 fun RepoItem (
-    repository: Repository
+    repository: Repository,
+    onEdit: (Repository) -> Unit = {},
+    onDelete: (Repository) -> Unit = {}
 ) {
     Card(modifier = Modifier
         .padding(8.dp)
@@ -42,7 +50,7 @@ fun RepoItem (
         ) {
             AsyncImage(
                 model = repository.owner.avatarUrl,
-                contentDescription = "Imagen de repositorio \"$repository.name\"",
+                contentDescription = "Imagen de repositorio \"${repository.name}\"",
                 modifier= Modifier.size(60.dp),
                 contentScale = ContentScale.Crop
             )
@@ -68,6 +76,28 @@ fun RepoItem (
                     )
                 }
 
+                Row {
+                    IconButton(
+                        onClick = { onEdit(repository) } // <--- CRUCIAL: Aquí debes enviarle el 'repository'
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit, // O el ícono que uses para el lápiz
+                            contentDescription = "Editar repositorio"
+                        )
+                    }
+
+                    IconButton(
+                        onClick = {
+                            onDelete(repository)
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Eliminar"
+                        )
+                    }
+                }
+
             }
         }
 
@@ -85,7 +115,7 @@ fun RepoItemPreview() {
             language = "kotlin",
             owner = GitHubUser(
                 id = "123",
-                login = "rodmunoz28@gmail.com",
+                login = "Daniela070806",
                 avatarUrl = "https://static.vecteezy.com/system/resources/previews/077/675/681/non_2x/simple-outline-round-user-account-profile-avatar-sign-icon-vector.jpg",
 
             )
